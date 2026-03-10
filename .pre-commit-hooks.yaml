@@ -1,0 +1,17 @@
+- id: gitignoreline-check
+  name: gitignoreline check
+  description: Verify no gitignore-marked lines leaked into staged content.
+  entry: gitignoreline check
+  language: python
+  always_run: true
+  pass_filenames: false
+  stages: [pre-commit]
+
+- id: gitignoreline-ci-check
+  name: gitignoreline ci-check
+  description: Verify no gitignore-marked lines exist in committed content (for CI).
+  entry: gitignoreline ci-check
+  language: python
+  always_run: true
+  pass_filenames: false
+  stages: [manual]
