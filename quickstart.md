@@ -70,7 +70,7 @@ Add a `CONTRIBUTING.md` note:
 ```markdown
 ## Setup
 
-This project uses [gitignoreline](https://github.com/example/gitignoreline)
+This project uses [gitignoreline](https://github.com/h3ll5ur7er/gitignoreline)
 to keep local secrets out of commits.
 
 After cloning, run:
@@ -101,7 +101,7 @@ If your project already uses the pre-commit framework, add this to
 
 ```yaml
 repos:
-  - repo: https://github.com/example/gitignoreline
+  - repo: https://github.com/h3ll5ur7er/gitignoreline
     rev: v0.1.0
     hooks:
       - id: gitignoreline-check

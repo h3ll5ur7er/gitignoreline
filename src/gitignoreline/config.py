@@ -19,7 +19,7 @@ CONFIG_FILENAME = ".gitignoreline"
 
 DEFAULT_TEMPLATE = """\
 # gitignoreline configuration
-# See: https://github.com/example/gitignoreline
+# See: https://github.com/h3ll5ur7er/gitignoreline
 
 # Override or add file extension -> comment style mappings.
 # Each entry maps an extension to [prefix, suffix].

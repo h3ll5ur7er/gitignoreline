@@ -5,9 +5,32 @@ description = "Line-level git ignore: strip marked lines and blocks before they 
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.9"
+authors = [
+    {name = "h3ll5ur7er"},
+]
+keywords = ["git", "gitignore", "secrets", "filter", "clean", "smudge"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Version Control :: Git",
+]
 dependencies = [
     "click>=8.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/h3ll5ur7er/gitignoreline"
+Repository = "https://github.com/h3ll5ur7er/gitignoreline"
+Issues = "https://github.com/h3ll5ur7er/gitignoreline/issues"
 
 [project.scripts]
 gitignoreline = "gitignoreline.cli:main"

@@ -1,5 +1,9 @@
 # gitignoreline
 
+[![CI](https://github.com/h3ll5ur7er/gitignoreline/actions/workflows/ci.yml/badge.svg)](https://github.com/h3ll5ur7er/gitignoreline/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/gitignoreline)](https://pypi.org/project/gitignoreline/)
+[![Python](https://img.shields.io/pypi/pyversions/gitignoreline)](https://pypi.org/project/gitignoreline/)
+
 Line-level git ignore. Mark individual lines or blocks in any source file with a comment, and they will be **automatically stripped before commit** — your working copy keeps them, the repository never sees them.
 
 Built on git's native [clean/smudge filter](https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#_keyword_expansion) mechanism, so it works transparently with `git add`, `git commit`, and `git diff`.
@@ -7,15 +11,16 @@ Built on git's native [clean/smudge filter](https://git-scm.com/book/en/v2/Custo
 ## Quick Start
 
 ```bash
-# Install
-uv tool install .          # or: pip install .
+# Install (pick one)
+uv tool install gitignoreline        # recommended
+pip install gitignoreline            # or classic pip
 
 # Set up in your repo
 cd your-repo
 gitignoreline init
-
-# Done — now mark lines in your code:
 ```
+
+Now mark lines in your code:
 
 ```python
 host = "localhost"
@@ -52,10 +57,6 @@ secret = "value"  # gitignore
 
 ```javascript
 const key = "abc123"; // gitignore
-```
-
-```html
-<div class="debug-panel"><!-- gitignore --></div>
 ```
 
 ```css
@@ -102,11 +103,21 @@ The comment style is auto-detected from the file extension:
 | `/* gitignore */` | `.css`, `.scss`, `.sass`, `.less` |
 | `; gitignore` | `.ini`, `.asm`, `.clj`, `.lisp` |
 
+Custom extensions can be added via a [`.gitignoreline` config file](#configuration).
+
 ## CLI Commands
 
-### `gitignoreline init`
+| Command | Description |
+|---|---|
+| `gitignoreline init` | Set up filters and `.gitattributes` in the current repo |
+| `gitignoreline status` | Show files and lines with gitignore markers |
+| `gitignoreline check` | Verify no markers leaked into staged content (pre-commit hook) |
+| `gitignoreline ci-check` | Verify no markers in committed content (CI pipeline) |
+| `gitignoreline install-hooks` | Install a git pre-commit hook |
+| `gitignoreline save` | Backup marked lines to `.gitignoreline.local` |
+| `gitignoreline restore` | Restore marked lines from `.gitignoreline.local` |
 
-Set up gitignoreline in the current repository.
+### `gitignoreline init`
 
 ```bash
 gitignoreline init                    # Enable for all known extensions
@@ -114,58 +125,54 @@ gitignoreline init -e .py -e .js      # Enable only for specific extensions
 gitignoreline init --write-config     # Also create a .gitignoreline config template
 ```
 
-This:
-- Registers the clean/smudge filter in `.git/config`
-- Creates/updates `.gitattributes` with filter patterns
-- Adds `.gitignoreline.local` to `.gitignore`
-
-### `gitignoreline status`
-
-Show all files and lines that have gitignore markers in the working copy.
+### `gitignoreline check` / `gitignoreline ci-check`
 
 ```bash
-gitignoreline status                  # Scan all tracked files
-gitignoreline status -f config.py     # Scan a specific file
+gitignoreline check                   # Check staged content (pre-commit)
+gitignoreline ci-check                # Check committed content at HEAD (CI)
+gitignoreline ci-check --ref main     # Check a specific ref
 ```
 
-### `gitignoreline check`
-
-Verify that no marked lines leaked into staged content. Useful as a **pre-commit hook**.
+### `gitignoreline install-hooks`
 
 ```bash
-gitignoreline check
+gitignoreline install-hooks           # Writes .git/hooks/pre-commit
 ```
 
-Exits with code 1 if any markers are found in the staged content — this means the clean filter may not be configured correctly.
-
-To use as a pre-commit hook, add to `.git/hooks/pre-commit`:
+### `gitignoreline save` / `gitignoreline restore`
 
 ```bash
-#!/bin/sh
-gitignoreline check
+gitignoreline save                    # Snapshot marked lines to .gitignoreline.local
+gitignoreline restore                 # Re-inject lines from .gitignoreline.local
 ```
 
-### `gitignoreline save`
+## Enforcing in Teams & Open Source
 
-Snapshot all currently marked lines to `.gitignoreline.local` (a gitignored JSON file).
+See [quickstart.md](quickstart.md) for a full enforcement guide. The short version:
 
-```bash
-gitignoreline save
+1. **Local hooks** — `gitignoreline install-hooks` or use the [pre-commit framework](https://pre-commit.com/):
+
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/h3ll5ur7er/gitignoreline
+    rev: v0.1.0
+    hooks:
+      - id: gitignoreline-check
 ```
 
-This creates a backup so content can be restored after branch switches or fresh clones.
+2. **CI gate** — add `gitignoreline ci-check` to your pipeline:
 
-### `gitignoreline restore`
-
-Restore marked lines from `.gitignoreline.local` back into working-copy files.
-
-```bash
-gitignoreline restore
+```yaml
+# .github/workflows/gitignoreline.yml
+- run: pip install gitignoreline && gitignoreline ci-check
 ```
+
+3. **Branch protection** — mark the CI job as a required status check.
 
 ## Configuration
 
-Create a `.gitignoreline` file (TOML) in the repository root to customise behavior.
+Create a `.gitignoreline` file (TOML) in the repository root:
 
 ```toml
 # Map custom extensions to comment styles: [prefix, suffix]
@@ -180,34 +187,37 @@ extensions = [".py", ".js", ".ts", ".yaml"]
 
 ## Installation
 
-### With uv (recommended)
+### From PyPI
 
 ```bash
-uv tool install gitignoreline            # Install globally
-uv tool install /path/to/gitignoreline   # Install from local checkout
+uv tool install gitignoreline        # recommended
+pip install gitignoreline            # classic pip
+pipx install gitignoreline           # or pipx
 ```
 
-### With pip
+### From source
 
 ```bash
-pip install gitignoreline
+git clone https://github.com/h3ll5ur7er/gitignoreline.git
+cd gitignoreline
+uv tool install .
 ```
 
 ### Development
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/h3ll5ur7er/gitignoreline.git
 cd gitignoreline
-uv sync            # Install with dev dependencies
-uv run pytest -v   # Run tests
+uv sync
+uv run pytest -v
 ```
 
 ## Important Notes
 
-- **Fresh clones won't have the marked lines** — they were never committed. Developers need to add their own local values, or use `gitignoreline restore` from a shared `.gitignoreline.local`.
-- **Each developer must run `gitignoreline init`** once per clone to register the filter in their local `.git/config`.
+- **Fresh clones won't have the marked lines** — they were never committed. Developers add their own local values, or use `gitignoreline restore` from a shared `.gitignoreline.local`.
+- **Each developer must run `gitignoreline init`** once per clone to register the filter locally.
 - The `.gitattributes` file **should be committed** so the project declares which files use the filter.
-- The `.gitignoreline.local` store file **should not be committed** (it's added to `.gitignore` automatically).
+- The `.gitignoreline.local` store file **should not be committed** (added to `.gitignore` automatically).
 
 ## License
 
